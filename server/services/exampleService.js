@@ -1,4 +1,3 @@
-// Business logic for example/health service
 const getHealthStatus = () => {
   return {
     status: 'OK',
