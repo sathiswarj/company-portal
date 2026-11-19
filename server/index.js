@@ -12,13 +12,21 @@ const taskRoutes = require('./src/routes/taskRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://minicrm-murex-xi.vercel.app',
+  ...(process.env.CLIENT_URL || '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/+$/, ''))
+    .filter(Boolean)
+];
 
 // Connect to Database & auto-seed mock/default data
 connectDB();
 
 // Middlewares
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: [...new Set(allowedOrigins)],
   credentials: true
 }));
 app.use(express.json());
@@ -30,7 +38,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/tasks', taskRoutes);
-
+app.use('/api/users', require('./src/routes/userRoutes'));
 // Root Health Route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Mini CRM API is running healthy on port 5000' });

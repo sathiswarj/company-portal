@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const configuredApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const normalizedApiUrl = configuredApiUrl.replace(/\/+$/, '');
+const API_BASE_URL = /\/api$/i.test(normalizedApiUrl)
+  ? normalizedApiUrl
+  : `${normalizedApiUrl}/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -97,6 +101,17 @@ export const createTask = async (taskData) => {
 
 export const updateTaskStatus = async (id, status) => {
   const response = await api.patch(`/tasks/${id}/status`, { status });
+  return response.data;
+};
+
+// Users Services
+export const getUsers = async (search = '') => {
+  const response = await api.get('/users', { params: { search } });
+  return response.data;
+};
+
+export const onboardUser = async (userData) => {
+  const response = await api.post('/users', userData);
   return response.data;
 };
 
